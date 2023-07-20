@@ -1,7 +1,0 @@
-C:\Users\Peter\my.net.loader\my.net.loader\my.net.loader\obj\Release\net5.0\my.net.loader.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\Peter\my.net.loader\my.net.loader\my.net.loader\obj\Release\net5.0\my.net.loader.AssemblyInfoInputs.cache
-C:\Users\Peter\my.net.loader\my.net.loader\my.net.loader\obj\Release\net5.0\my.net.loader.AssemblyInfo.cs
-C:\Users\Peter\my.net.loader\my.net.loader\my.net.loader\obj\Release\net5.0\my.net.loader.csproj.CoreCompileInputs.cache
-C:\Users\Peter\my.net.loader\my.net.loader\my.net.loader\obj\Release\net5.0\my.net.loader.dll
-C:\Users\Peter\my.net.loader\my.net.loader\my.net.loader\obj\Release\net5.0\ref\my.net.loader.dll
-C:\Users\Peter\my.net.loader\my.net.loader\my.net.loader\obj\Release\net5.0\my.net.loader.pdb
